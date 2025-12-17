@@ -17,7 +17,87 @@
 
 ## Quick Start
 
-### 1. Clone and Build
+### Installation Options
+
+You can either download a pre-built binary or build from source.
+
+#### Option 1: Download Pre-built Binary
+
+**Linux (AMD64)**
+```bash
+# Download the latest release
+wget https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-linux-amd64.tar.gz
+
+# Extract
+tar -xzf server-admin-bot-linux-amd64.tar.gz
+
+# Move to system path
+sudo mv server-admin-bot-linux-amd64 /usr/local/bin/server-admin-bot
+
+# Make executable
+sudo chmod +x /usr/local/bin/server-admin-bot
+```
+
+**Linux (ARM64)**
+```bash
+# Download the latest release
+wget https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-linux-arm64.tar.gz
+
+# Extract
+tar -xzf server-admin-bot-linux-arm64.tar.gz
+
+# Move to system path
+sudo mv server-admin-bot-linux-arm64 /usr/local/bin/server-admin-bot
+
+# Make executable
+sudo chmod +x /usr/local/bin/server-admin-bot
+```
+
+**macOS (Intel)**
+```bash
+# Download the latest release
+curl -L https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-darwin-amd64.tar.gz -o server-admin-bot-darwin-amd64.tar.gz
+
+# Extract
+tar -xzf server-admin-bot-darwin-amd64.tar.gz
+
+# Move to system path
+sudo mv server-admin-bot-darwin-amd64 /usr/local/bin/server-admin-bot
+
+# Make executable
+sudo chmod +x /usr/local/bin/server-admin-bot
+```
+
+**macOS (Apple Silicon)**
+```bash
+# Download the latest release
+curl -L https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-darwin-arm64.tar.gz -o server-admin-bot-darwin-arm64.tar.gz
+
+# Extract
+tar -xzf server-admin-bot-darwin-arm64.tar.gz
+
+# Move to system path
+sudo mv server-admin-bot-darwin-arm64 /usr/local/bin/server-admin-bot
+
+# Make executable
+sudo chmod +x /usr/local/bin/server-admin-bot
+```
+
+**Windows (AMD64)**
+```powershell
+# Download the latest release using PowerShell
+Invoke-WebRequest -Uri "https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-windows-amd64.zip" -OutFile "server-admin-bot-windows-amd64.zip"
+
+# Extract (using PowerShell)
+Expand-Archive -Path server-admin-bot-windows-amd64.zip -DestinationPath .
+
+# Run the executable
+.\server-admin-bot-windows-amd64.exe -config config.yaml
+```
+
+> **Note:** Replace `v1.0.0` with the latest version tag. Check the [releases page](https://github.com/RusEu/RadminTelegramBot/releases) for available versions.
+
+#### Option 2: Build from Source
 
 ```bash
 # Clone the repository
@@ -30,30 +110,14 @@ go mod download
 # Build the binary
 go build -o server-admin-bot ./cmd/bot/main.go
 
-# Move to system path
+# Move to system path (Linux/macOS)
 sudo mv server-admin-bot /usr/local/bin/
 
-# Make executable
+# Make executable (Linux/macOS)
 sudo chmod +x /usr/local/bin/server-admin-bot
 ```
 
-**Alternative: Download Pre-built Release**
-
-```bash
-# Download the latest release (replace with your architecture)
-wget https://github.com/RusEu/RadminTelegramBot/releases/latest/download/server-admin-bot-linux-amd64.tar.gz
-
-# Extract
-tar -xzf server-admin-bot-linux-amd64.tar.gz
-
-# Move to system path
-sudo mv server-admin-bot /usr/local/bin/
-
-# Make executable
-sudo chmod +x /usr/local/bin/server-admin-bot
-```
-
-### 2. Configure
+### Configuration
 
 ```bash
 # Create config directory
@@ -88,7 +152,9 @@ monitoring:
   disk_alert_threshold: 95
 ```
 
-### 3. Create System Service
+#### Linux/macOS System Service
+
+Create a systemd service file (Linux only):
 
 ```bash
 # Create service file
@@ -114,7 +180,7 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-### 4. Start the Service
+#### Starting the Service (Linux)
 
 ```bash
 # Reload systemd
@@ -127,6 +193,88 @@ sudo systemctl start server-admin-bot
 # Check status
 sudo systemctl status server-admin-bot
 ```
+
+#### macOS Launch Agent
+
+For macOS, create a Launch Agent:
+
+```bash
+# Create LaunchAgents directory if it doesn't exist
+mkdir -p ~/Library/LaunchAgents
+
+# Create launch agent plist file
+nano ~/Library/LaunchAgents/com.radmin.telegrambot.plist
+```
+
+Add the following configuration:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.radmin.telegrambot</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/server-admin-bot</string>
+        <string>-config</string>
+        <string>/etc/server-admin-bot/config.yaml</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardErrorPath</key>
+    <string>/tmp/server-admin-bot.err</string>
+    <key>StandardOutPath</key>
+    <string>/tmp/server-admin-bot.out</string>
+</dict>
+</plist>
+```
+
+Load and start the agent:
+
+```bash
+# Load the agent
+launchctl load ~/Library/LaunchAgents/com.radmin.telegrambot.plist
+
+# Start the agent
+launchctl start com.radmin.telegrambot
+
+# Check status
+launchctl list | grep radmin
+```
+
+#### Windows Service
+
+For Windows, you can run the bot as a service using NSSM (Non-Sucking Service Manager) or Task Scheduler:
+
+**Using NSSM:**
+
+```powershell
+# Download NSSM from https://nssm.cc/download
+# Extract nssm.exe to a directory
+
+# Install the service
+.\nssm.exe install ServerAdminBot "C:\Path\To\server-admin-bot-windows-amd64.exe" "-config" "C:\Path\To\config.yaml"
+
+# Start the service
+.\nssm.exe start ServerAdminBot
+
+# Check service status
+.\nssm.exe status ServerAdminBot
+```
+
+**Using Task Scheduler:**
+
+1. Open Task Scheduler
+2. Create a new task
+3. Set trigger to "At startup"
+4. Set action to start the program: `server-admin-bot-windows-amd64.exe`
+5. Add argument: `-config path\to\config.yaml`
+6. Configure to run whether user is logged on or not
+7. Save and run the task
 
 ## Getting Your Bot Token
 

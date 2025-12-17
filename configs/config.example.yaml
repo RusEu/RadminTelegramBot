@@ -1,0 +1,88 @@
+# Remote Server Admin Bot Configuration
+# Copy this file to config.yaml and modify according to your needs
+
+# Telegram Bot Configuration
+telegram:
+  # Get your bot token from @BotFather on Telegram
+  bot_token: "YOUR_BOT_TOKEN_HERE"
+  
+  # List of allowed user IDs (get from @userinfobot)
+  allowed_users:
+    - 123456789  # Replace with your Telegram user ID
+    - 987654321  # Add more user IDs as needed
+  
+  # Optional: Webhook configuration (leave empty for polling)
+  webhook_url: ""
+  webhook_port: 8443
+
+# Security Configuration
+security:
+  # Password for admin operations (change this!)
+  admin_password: "your_secure_admin_password_here"
+  
+  # Session timeout in seconds (3600 = 1 hour)
+  session_timeout: 3600
+  
+  # Maximum file upload size in bytes (52428800 = 50MB)
+  max_file_size: 52428800
+  
+  # Rate limiting settings
+  rate_limit_window: 60      # Time window in seconds
+  rate_limit_commands: 10    # Max commands per window
+
+# Server Configuration
+server:
+  # Server name for identification
+  name: "Production Server 1"
+  
+  # Server timezone
+  timezone: "UTC"
+  
+  # Logging level: debug, info, warn, error
+  log_level: "info"
+  
+  # Working directory for file operations
+  working_dir: "/tmp"
+  
+  # Optional: Log to file (leave empty for stdout only)
+  log_file: "/var/log/server-admin-bot.log"
+
+# Monitoring Configuration
+monitoring:
+  # Alert thresholds (percentage)
+  cpu_alert_threshold: 85.0     # CPU usage alert at 85%
+  memory_alert_threshold: 90.0  # Memory usage alert at 90%
+  disk_alert_threshold: 95.0    # Disk usage alert at 95%
+  
+  # Monitoring interval in seconds (300 = 5 minutes)
+  monitoring_interval: 300
+  
+  # Alert cooldown in seconds (1800 = 30 minutes)
+  # Prevents spam by not sending duplicate alerts
+  alert_cooldown: 1800
+
+# Environment Variables Support:
+# You can use environment variables in any string value:
+# bot_token: "${BOT_TOKEN}"
+# admin_password: "${ADMIN_PASSWORD}"
+
+# Examples of different configurations:
+
+# Development Server Example:
+# server:
+#   name: "Development Server"
+#   log_level: "debug"
+#   working_dir: "/home/user/workspace"
+
+# High-Security Production Example:
+# security:
+#   session_timeout: 1800        # 30 minutes
+#   max_file_size: 10485760      # 10MB
+#   rate_limit_window: 60
+#   rate_limit_commands: 5       # Stricter rate limiting
+
+# High-Traffic Server Example:
+# monitoring:
+#   cpu_alert_threshold: 95.0    # Higher threshold
+#   monitoring_interval: 60      # More frequent monitoring
+#   alert_cooldown: 900          # 15 minutes cooldown

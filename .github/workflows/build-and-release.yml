@@ -64,12 +64,20 @@ jobs:
       - name: Create tarball (Unix)
         if: matrix.goos != 'windows'
         run: |
-          tar -czf ${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }} README.md LICENSE 2>/dev/null || tar -czf ${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }} README.md
+          if [ -f LICENSE ]; then
+            tar -czf ${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }} README.md LICENSE
+          else
+            tar -czf ${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }} README.md
+          fi
 
       - name: Create zip (Windows)
         if: matrix.goos == 'windows'
         run: |
-          zip ${{ matrix.artifact_name }}.zip ${{ matrix.artifact_name }}.exe README.md LICENSE 2>/dev/null || zip ${{ matrix.artifact_name }}.zip ${{ matrix.artifact_name }}.exe README.md
+          if [ -f LICENSE ]; then
+            zip ${{ matrix.artifact_name }}.zip ${{ matrix.artifact_name }}.exe README.md LICENSE
+          else
+            zip ${{ matrix.artifact_name }}.zip ${{ matrix.artifact_name }}.exe README.md
+          fi
 
       - name: Upload artifact (Unix)
         if: matrix.goos != 'windows'

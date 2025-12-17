@@ -225,9 +225,6 @@ go mod download
 
 # Build for current platform
 go build -o server-admin-bot ./cmd/bot/main.go
-
-# Or use Make (for Python version)
-make build
 ```
 
 ### Cross-compilation

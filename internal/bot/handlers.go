@@ -338,6 +338,13 @@ func (b *Bot) handleCatFile(chatID int64, text string) {
 	filePath := parts[1]
 	b.logger.Infof("📄 Cat file request: %s", filePath)
 
+	// Validate file path for security
+	if !b.auth.ValidateFilePath(filePath) {
+		b.logger.Warnf("🚫 Blocked cat access to path: %s", filePath)
+		b.sendMessage(chatID, "❌ Access to this file is not allowed for security reasons")
+		return
+	}
+
 	// Read file contents
 	content, err := os.ReadFile(filePath)
 	if err != nil {
@@ -369,6 +376,13 @@ func (b *Bot) handleDownload(chatID int64, text string) {
 
 	filePath := parts[1]
 	b.logger.Infof("📥 Download request: %s", filePath)
+
+	// Validate file path for security
+	if !b.auth.ValidateFilePath(filePath) {
+		b.logger.Warnf("🚫 Blocked download access to path: %s", filePath)
+		b.sendMessage(chatID, "❌ Access to this file is not allowed for security reasons")
+		return
+	}
 
 	// Check if file exists
 	fileInfo, err := os.Stat(filePath)
@@ -406,6 +420,19 @@ func (b *Bot) handleKillProcess(chatID int64, text string) {
 	pid, err := strconv.Atoi(pidStr)
 	if err != nil {
 		b.sendMessage(chatID, "❌ Invalid PID. Must be a number.")
+		return
+	}
+
+	// Basic safety checks - don't allow killing critical PIDs
+	if pid <= 0 {
+		b.sendMessage(chatID, "❌ Invalid PID. Must be a positive number.")
+		return
+	}
+
+	// Don't allow killing init/systemd (PID 1) or kernel processes (PID < 300 typically)
+	if pid < 300 {
+		b.logger.Warnf("🚫 Attempted to kill critical system process: PID %d", pid)
+		b.sendMessage(chatID, "❌ Cannot kill critical system processes (PID < 300) for safety reasons.")
 		return
 	}
 

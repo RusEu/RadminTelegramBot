@@ -15,3 +15,10 @@ pip-delete-this-directory.txt
 
 # vscode
 .vscode/*
+
+# Go binaries
+server-admin-bot
+server-admin-bot-*
+*.exe
+*.tar.gz
+*.zip

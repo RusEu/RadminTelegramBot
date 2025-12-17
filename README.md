@@ -17,11 +17,31 @@
 
 ## Quick Start
 
-### 1. Download and Install
+### 1. Clone and Build
 
 ```bash
-# Download the latest release
-wget https://github.com/yourusername/remote-server-admin-bot/releases/latest/download/server-admin-bot-linux-amd64.tar.gz
+# Clone the repository
+git clone https://github.com/RusEu/RadminTelegramBot.git
+cd RadminTelegramBot
+
+# Install Go dependencies
+go mod download
+
+# Build the binary
+go build -o server-admin-bot ./cmd/bot/main.go
+
+# Move to system path
+sudo mv server-admin-bot /usr/local/bin/
+
+# Make executable
+sudo chmod +x /usr/local/bin/server-admin-bot
+```
+
+**Alternative: Download Pre-built Release**
+
+```bash
+# Download the latest release (replace with your architecture)
+wget https://github.com/RusEu/RadminTelegramBot/releases/latest/download/server-admin-bot-linux-amd64.tar.gz
 
 # Extract
 tar -xzf server-admin-bot-linux-amd64.tar.gz
@@ -197,30 +217,27 @@ sudo systemctl status server-admin-bot
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/remote-server-admin-bot.git
-cd remote-server-admin-bot
+git clone https://github.com/RusEu/RadminTelegramBot.git
+cd RadminTelegramBot
 
 # Install dependencies
-go mod tidy
+go mod download
 
 # Build for current platform
-go build -o server-admin-bot cmd/bot/main.go
-
-# Build for multiple platforms
-make build-all
+go build -o server-admin-bot ./cmd/bot/main.go
 ```
 
 ### Cross-compilation
 
 ```bash
 # Linux AMD64
-GOOS=linux GOARCH=amd64 go build -o server-admin-bot-linux-amd64 cmd/bot/main.go
+GOOS=linux GOARCH=amd64 go build -o server-admin-bot-linux-amd64 ./cmd/bot/main.go
 
 # Linux ARM64
-GOOS=linux GOARCH=arm64 go build -o server-admin-bot-linux-arm64 cmd/bot/main.go
+GOOS=linux GOARCH=arm64 go build -o server-admin-bot-linux-arm64 ./cmd/bot/main.go
 
 # Windows AMD64
-GOOS=windows GOARCH=amd64 go build -o server-admin-bot-windows-amd64.exe cmd/bot/main.go
+GOOS=windows GOARCH=amd64 go build -o server-admin-bot-windows-amd64.exe ./cmd/bot/main.go
 ```
 
 ## Logs and Troubleshooting
@@ -302,9 +319,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/yourusername/remote-server-admin-bot/issues) page
+1. Check the [Issues](https://github.com/RusEu/RadminTelegramBot/issues) page
 2. Create a new issue with detailed information
-3. Join our [Telegram group](https://t.me/your_support_group) for community support
 
 ## Changelog
 

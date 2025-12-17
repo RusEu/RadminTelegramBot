@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -262,8 +261,9 @@ func (im *InfoManager) GetTopProcesses(limit int) (string, error) {
 		}
 
 		status, err := p.Status()
-		if err != nil {
-			status = "unknown"
+		statusStr := "unknown"
+		if err == nil && len(status) > 0 {
+			statusStr = status[0]
 		}
 
 		processInfos = append(processInfos, ProcessInfo{
@@ -271,7 +271,7 @@ func (im *InfoManager) GetTopProcesses(limit int) (string, error) {
 			Name:   name,
 			CPU:    cpuPercent,
 			Memory: memPercent,
-			Status: status,
+			Status: statusStr,
 		})
 
 		if len(processInfos) >= limit*2 { // Get more than needed for sorting

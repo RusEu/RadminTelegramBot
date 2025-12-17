@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/yourusername/remote-server-admin-bot/internal/bot"
-	"github.com/yourusername/remote-server-admin-bot/internal/config"
-	"github.com/yourusername/remote-server-admin-bot/internal/utils"
+	"github.com/RusEu/RadminTelegramBot/internal/bot"
+	"github.com/RusEu/RadminTelegramBot/internal/config"
+	"github.com/RusEu/RadminTelegramBot/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -11,7 +11,7 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/yourusername/remote-server-admin-bot/internal/config"
+	"github.com/RusEu/RadminTelegramBot/internal/config"
 )
 
 // MonitoringManager handles system monitoring and alerts

@@ -11,9 +11,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/yourusername/remote-server-admin-bot/internal/config"
-	"github.com/yourusername/remote-server-admin-bot/internal/security"
-	"github.com/yourusername/remote-server-admin-bot/internal/system"
+	"github.com/RusEu/RadminTelegramBot/internal/config"
+	"github.com/RusEu/RadminTelegramBot/internal/security"
+	"github.com/RusEu/RadminTelegramBot/internal/system"
 )
 
 // Bot represents the Telegram bot instance

@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -307,6 +308,231 @@ func (b *Bot) handleExecCommand(chatID int64, session *UserSession, text string)
 	msg := tgbotapi.NewMessage(chatID, response)
 	msg.ParseMode = "Markdown"
 	b.api.Send(msg)
+}
+
+// handleFileUpload handles file uploads
+func (b *Bot) handleFileUpload(chatID int64, document *tgbotapi.Document) {
+	b.logger.Infof("📤 File upload request: %s (%s)", document.FileName, document.FileID)
+	
+	// Get file
+	fileURL, err := b.api.GetFileDirectURL(document.FileID)
+	if err != nil {
+		b.logger.Errorf("❌ Failed to get file URL: %v", err)
+		b.sendMessage(chatID, "❌ Failed to download file")
+		return
+	}
+
+	b.logger.Infof("✅ File uploaded: %s, URL: %s", document.FileName, fileURL)
+	b.sendMessage(chatID, fmt.Sprintf("✅ File received: **%s** (%d bytes)\n\nUse /ls to see uploaded files", 
+		document.FileName, document.FileSize))
+}
+
+// handleCatFile handles the /cat command to display file contents
+func (b *Bot) handleCatFile(chatID int64, text string) {
+	parts := strings.Fields(text)
+	if len(parts) < 2 {
+		b.sendMessage(chatID, "❌ Usage: /cat <file>")
+		return
+	}
+
+	filePath := parts[1]
+	b.logger.Infof("📄 Cat file request: %s", filePath)
+
+	// Read file contents
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		b.logger.Errorf("❌ Failed to read file %s: %v", filePath, err)
+		b.sendMessage(chatID, fmt.Sprintf("❌ Error reading file: %v", err))
+		return
+	}
+
+	// Limit content size
+	maxSize := 4000
+	contentStr := string(content)
+	if len(contentStr) > maxSize {
+		contentStr = contentStr[:maxSize] + "\n...(truncated)"
+	}
+
+	response := fmt.Sprintf("📄 **File: %s**\n\n```\n%s\n```", filePath, contentStr)
+	msg := tgbotapi.NewMessage(chatID, response)
+	msg.ParseMode = "Markdown"
+	b.api.Send(msg)
+}
+
+// handleDownload handles the /download command to send files to user
+func (b *Bot) handleDownload(chatID int64, text string) {
+	parts := strings.Fields(text)
+	if len(parts) < 2 {
+		b.sendMessage(chatID, "❌ Usage: /download <file>")
+		return
+	}
+
+	filePath := parts[1]
+	b.logger.Infof("📥 Download request: %s", filePath)
+
+	// Check if file exists
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		b.logger.Errorf("❌ File not found: %s - %v", filePath, err)
+		b.sendMessage(chatID, fmt.Sprintf("❌ File not found: %v", err))
+		return
+	}
+
+	if fileInfo.IsDir() {
+		b.sendMessage(chatID, "❌ Cannot download directories. Please specify a file.")
+		return
+	}
+
+	// Send the file
+	caption := fmt.Sprintf("📥 %s (%s)", filepath.Base(filePath), formatBytes(uint64(fileInfo.Size())))
+	if err := b.sendDocument(chatID, filePath, caption); err != nil {
+		b.logger.Errorf("❌ Failed to send file: %v", err)
+		b.sendMessage(chatID, fmt.Sprintf("❌ Failed to send file: %v", err))
+		return
+	}
+
+	b.logger.Infof("✅ File sent: %s", filePath)
+}
+
+// handleKillProcess handles the /kill command to terminate processes
+func (b *Bot) handleKillProcess(chatID int64, text string) {
+	parts := strings.Fields(text)
+	if len(parts) < 2 {
+		b.sendMessage(chatID, "❌ Usage: /kill <pid>")
+		return
+	}
+
+	pidStr := parts[1]
+	pid, err := strconv.Atoi(pidStr)
+	if err != nil {
+		b.sendMessage(chatID, "❌ Invalid PID. Must be a number.")
+		return
+	}
+
+	b.logger.Warnf("⚠️ Kill process request: PID %d", pid)
+
+	// Find and kill the process
+	proc, err := os.FindProcess(pid)
+	if err != nil {
+		b.logger.Errorf("❌ Process not found: PID %d - %v", pid, err)
+		b.sendMessage(chatID, fmt.Sprintf("❌ Process not found: %v", err))
+		return
+	}
+
+	if err := proc.Kill(); err != nil {
+		b.logger.Errorf("❌ Failed to kill process %d: %v", pid, err)
+		b.sendMessage(chatID, fmt.Sprintf("❌ Failed to kill process: %v", err))
+		return
+	}
+
+	b.logger.Infof("✅ Process killed: PID %d", pid)
+	b.sendMessage(chatID, fmt.Sprintf("✅ Process killed: PID %d", pid))
+}
+
+// handleLogs handles the /logs command to show system logs
+func (b *Bot) handleLogs(chatID int64, text string) {
+	parts := strings.Fields(text)
+	lines := 50 // Default number of lines
+	
+	if len(parts) > 1 {
+		if n, err := strconv.Atoi(parts[1]); err == nil && n > 0 {
+			lines = n
+			if lines > 200 {
+				lines = 200 // Limit to 200 lines
+			}
+		}
+	}
+
+	b.logger.Infof("📝 Logs request: %d lines", lines)
+
+	// Try to read system logs
+	cmd := exec.Command("journalctl", "-n", strconv.Itoa(lines), "--no-pager")
+	output, err := cmd.Output()
+	
+	// Fallback to other log sources if journalctl is not available
+	if err != nil {
+		// Try reading from /var/log/syslog
+		cmd = exec.Command("tail", "-n", strconv.Itoa(lines), "/var/log/syslog")
+		output, err = cmd.Output()
+		
+		if err != nil {
+			b.logger.Errorf("❌ Failed to read logs: %v", err)
+			b.sendMessage(chatID, "❌ Failed to read system logs. Journalctl or syslog not accessible.")
+			return
+		}
+	}
+
+	logsText := string(output)
+	if len(logsText) > 4000 {
+		logsText = logsText[len(logsText)-4000:]
+	}
+
+	response := fmt.Sprintf("📝 **System Logs (last %d lines):**\n\n```\n%s\n```", lines, logsText)
+	msg := tgbotapi.NewMessage(chatID, response)
+	msg.ParseMode = "Markdown"
+	b.api.Send(msg)
+}
+
+// handleAdmin handles the /admin command with subcommands
+func (b *Bot) handleAdmin(chatID int64, session *UserSession, text string) {
+	parts := strings.Fields(text)
+	
+	// If no subcommand, show admin menu
+	if len(parts) < 2 {
+		b.handleAdminMenu(chatID, session)
+		return
+	}
+
+	subcommand := parts[1]
+	b.logger.Infof("⚙️ Admin command: %s by @%s", subcommand, session.Username)
+
+	switch subcommand {
+	case "reboot":
+		b.sendMessage(chatID, "⚠️ Reboot command disabled for safety. Please use your system's management console.")
+	case "shutdown":
+		b.sendMessage(chatID, "⚠️ Shutdown command disabled for safety. Please use your system's management console.")
+	case "update":
+		b.sendMessage(chatID, "🔄 System update initiated... (This is a placeholder - implement actual update logic)")
+	default:
+		b.sendMessage(chatID, "❓ Unknown admin command. Available: reboot, shutdown, update")
+	}
+}
+
+// handleAdminMenu shows the admin menu
+func (b *Bot) handleAdminMenu(chatID int64, session *UserSession) {
+	b.logger.Infof("⚙️ Admin menu requested by @%s", session.Username)
+	
+	adminText := `⚙️ **Admin Functions**
+
+**Available Commands:**
+• /admin reboot - Reboot system
+• /admin shutdown - Shutdown system
+• /admin update - Update system
+
+**System Control:**
+Use these commands with caution!
+
+**Current Session:**
+• User: @` + session.Username + `
+• Session started: ` + session.StartTime.Format("2006-01-02 15:04:05")
+
+	msg := tgbotapi.NewMessage(chatID, adminText)
+	msg.ParseMode = "Markdown"
+	b.api.Send(msg)
+}
+
+// Helper function for formatting bytes (moved here to use in handlers)
+func formatBytes(bytes uint64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	div, exp := uint64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
 // handleCallbackQuery handles inline keyboard callbacks

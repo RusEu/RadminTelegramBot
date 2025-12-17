@@ -25,7 +25,7 @@ You can either download a pre-built binary or build from source.
 
 **Linux (AMD64)**
 ```bash
-# Download the latest release
+# Download the release (replace v1.0.0 with the latest version)
 wget https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-linux-amd64.tar.gz
 
 # Extract
@@ -40,7 +40,7 @@ sudo chmod +x /usr/local/bin/server-admin-bot
 
 **Linux (ARM64)**
 ```bash
-# Download the latest release
+# Download the release (replace v1.0.0 with the latest version)
 wget https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-linux-arm64.tar.gz
 
 # Extract
@@ -55,7 +55,7 @@ sudo chmod +x /usr/local/bin/server-admin-bot
 
 **macOS (Intel)**
 ```bash
-# Download the latest release
+# Download the release (replace v1.0.0 with the latest version)
 curl -L https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-darwin-amd64.tar.gz -o server-admin-bot-darwin-amd64.tar.gz
 
 # Extract
@@ -70,7 +70,7 @@ sudo chmod +x /usr/local/bin/server-admin-bot
 
 **macOS (Apple Silicon)**
 ```bash
-# Download the latest release
+# Download the release (replace v1.0.0 with the latest version)
 curl -L https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-darwin-arm64.tar.gz -o server-admin-bot-darwin-arm64.tar.gz
 
 # Extract
@@ -85,7 +85,7 @@ sudo chmod +x /usr/local/bin/server-admin-bot
 
 **Windows (AMD64)**
 ```powershell
-# Download the latest release using PowerShell
+# Download the release (replace v1.0.0 with the latest version) using PowerShell
 Invoke-WebRequest -Uri "https://github.com/RusEu/RadminTelegramBot/releases/download/v1.0.0/server-admin-bot-windows-amd64.zip" -OutFile "server-admin-bot-windows-amd64.zip"
 
 # Extract (using PowerShell)

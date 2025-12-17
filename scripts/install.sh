@@ -137,7 +137,7 @@ echo -e "${BLUE}🔧 Creating systemd service...${NC}"
 cat > "/etc/systemd/system/$SERVICE_NAME.service" << EOF
 [Unit]
 Description=Remote Server Admin Bot
-Documentation=https://github.com/yourusername/remote-server-admin-bot
+Documentation=https://github.com/RusEu/RadminTelegramBot
 After=network.target network-online.target
 Wants=network-online.target
 Requires=network.target

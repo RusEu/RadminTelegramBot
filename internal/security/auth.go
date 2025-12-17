@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/yourusername/remote-server-admin-bot/internal/config"
+	"github.com/RusEu/RadminTelegramBot/internal/config"
 )
 
 // AuthManager handles authentication and authorization
@@ -209,7 +209,7 @@ func (am *AuthManager) ValidateFilePath(path string) bool {
 	}
 
 	// Check for directory traversal
-	if strings.Contains(path, "../") || strings.Contains(path, "..\\`) {
+	if strings.Contains(path, "../") || strings.Contains(path, "..\\") {
 		am.logger.Warnf("🚫 Blocked directory traversal attempt: %s", path)
 		return false
 	}

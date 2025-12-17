@@ -272,7 +272,7 @@ For Windows, you can run the bot as a service using NSSM (Non-Sucking Service Ma
 2. Create a new task
 3. Set trigger to "At startup"
 4. Set action to start the program: `server-admin-bot-windows-amd64.exe`
-5. Add argument: `-config path\to\config.yaml`
+5. Add argument: `-config C:\Path\To\config.yaml`
 6. Configure to run whether user is logged on or not
 7. Save and run the task
 
